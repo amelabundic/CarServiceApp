@@ -1,0 +1,23 @@
+﻿<li class="nav-item px-3">
+    <NavLink class="nav-link" href="/">Početna</NavLink>
+</li>
+
+<li class="nav-item px-3">
+    <NavLink class="nav-link" href="/zakazivanje">Zakazivanje</NavLink>
+</li>
+
+<li class="nav-item px-3">
+    <NavLink class="nav-link" href="/termini">Termini</NavLink>
+</li>
+
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

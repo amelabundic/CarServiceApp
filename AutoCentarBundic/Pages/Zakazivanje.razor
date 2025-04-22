@@ -1,0 +1,128 @@
+﻿@using AutoCentarBundic.Data
+@using Microsoft.EntityFrameworkCore;
+@using System.Net.Http.Json
+
+@page "/zakazivanje"
+@inject TerminService TerminService
+@inject NavigationManager Navigation
+
+<h3>Dodaj termin</h3>
+
+<EditForm Model="@noviTermin" OnValidSubmit="@SubmitForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="ime">Ime:</label>
+        <InputText id="ime" class="form-control" @bind-Value="noviTermin.Ime" />
+    </div>
+
+    <div class="form-group">
+        <label for="prezime">Prezime:</label>
+        <InputText id="prezime" class="form-control" @bind-Value="noviTermin.Prezime" />
+    </div>
+
+    <div class="form-group">
+        <label for="automobil">Automobil (model):</label>
+        <InputText id="automobil" class="form-control" @bind-Value="noviTermin.Automobil" />
+    </div>
+
+    <div class="form-group">
+        <label for="datum">Datum:</label>
+        <InputDate id="datum" class="form-control" @bind-Value="datum" />
+    </div>
+
+    <div class="form-group">
+        <label for="vrijeme">Vrijeme:</label>
+        <div class="form-row d-flex align-items-center mt-2">
+            <label class="mr-2">Odaberi vrijeme:</label>
+
+            <select class="form-control mr-2" style="width: 100px;" @bind="sati">
+                @for (int h = 8; h <= 17; h++)
+                {
+                    <option value="@h">@h.ToString("D2")</option>
+                }
+            </select>
+
+            <span class="mr-2">:</span>
+
+            <select class="form-control" style="width: 100px;" @bind="minute">
+                @for (int m = 0; m < 60; m += 5)
+                {
+                    <option value="@m">@m.ToString("D2")</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    @if (invalidTime)
+    {
+        <div class="text-danger">Vrijeme mora biti između 08:00 i 17:00.</div>
+    }
+
+    <div class="form-group">
+        <label for="problem">Opis problema:</label>
+        <InputTextArea id="problem" class="form-control" @bind-Value="noviTermin.Problem" />
+    </div>
+
+    <button type="submit" class="btn btn-primary" disabled="@disableSubmit">Dodaj termin</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(poruka))
+{
+    <div class="alert alert-info mt-3">@poruka</div>
+}
+
+@code {
+    private Termin noviTermin = new Termin();
+    private DateTime datum = DateTime.Today;
+    private string vrijemeString = "08:00";
+    private TimeSpan? vrijeme;
+    private bool invalidTime = false;
+    private bool disableSubmit = false;
+    private string poruka = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        vrijeme = TimeSpan.Parse(vrijemeString);
+    }
+
+    private int sati = 8;
+    private int minute = 0;
+
+    private async Task SubmitForm()
+    {
+        vrijeme = new TimeSpan(sati, minute, 0);
+        vrijemeString = vrijeme.Value.ToString(@"hh\:mm");
+
+        var start = new TimeSpan(8, 0, 0);
+        var end = new TimeSpan(17, 0, 0);
+        invalidTime = vrijeme < start || vrijeme > end;
+        disableSubmit = invalidTime;
+
+        if (vrijeme.HasValue && !invalidTime)
+        {
+            noviTermin.Datum = datum.Date + vrijeme.Value;
+
+            var uspjesno = await TerminService.AddTerminAsync(noviTermin);
+
+            if (uspjesno)
+            {
+                noviTermin = new Termin();
+                datum = DateTime.Today;
+                vrijemeString = "08:00";
+                vrijeme = TimeSpan.Parse(vrijemeString);
+                disableSubmit = false;
+                invalidTime = false;
+
+                Navigation.NavigateTo("/termini", forceLoad: true);
+                return;
+            }
+            else
+            {
+                poruka = "Došlo je do greške prilikom dodavanja termina.";
+            }
+        }
+    }
+}
+

@@ -1,0 +1,75 @@
+﻿@using AutoCentarBundic.Data
+@using Microsoft.EntityFrameworkCore;
+
+@page "/termini"
+@inject TerminService TerminService
+
+
+<h3>Zakazani termini</h3>
+
+@if(termini == null)
+{
+    <p>Učitavanje termina...</p>
+}
+
+else if(!termini.Any())
+{
+   <p>Nema zakazanih termina.</p>
+}
+
+else
+{
+ <table class="table">
+     <thead>
+         <tr>
+             <th>Ime</th>
+            <th>Prezime</th>
+            <th>Datum</th>
+            <th>Automobil</th>
+            <th>Problem</th>
+         </tr>
+     </thead>
+     <tbody>
+         @foreach(var termin in termini)
+            {
+               <tr>
+                    <td>@termin.Ime</td>
+                    <td>@termin.Prezime</td>
+                    <td>@termin.Datum.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@termin.Automobil</td>
+                    <td>@termin.Problem</td>
+                    <td>
+                        <a href="@($"/termin/{termin.Id}")" class="btn btn-info me-2">Detalji</a>
+                        <button @onclick="() => DeleteTermin(termin.Id)" class="btn btn-danger">Obriši</button>
+                    </td>
+
+               </tr>
+            }
+    </tbody>
+ </table>
+
+   
+
+}
+
+
+@code {
+    private List<Termin> termini = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        termini = await TerminService.GetTerminiAsync();
+    }
+
+
+    private async Task DeleteTermin(int id)
+    {
+        var uspjesno = await TerminService.DeleteTerminAsync(id);
+        if (uspjesno)
+        {
+            termini.RemoveAll(t => t.Id == id);
+        }
+    }
+
+
+}
