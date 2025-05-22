@@ -1,0 +1,137 @@
+﻿@page "/registracija"
+@using System.ComponentModel.DataAnnotations
+@using AutoCentarBundic.Data
+@using AutoCentarBundic.Services
+@inject NavigationManager Navigation
+@inject UserService UserService
+
+<h3>Registracija korisnika</h3>
+
+<EditForm Model="@model" OnValidSubmit="RegistrujKorisnika">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label>Ime:</label>
+        <InputText class="form-control" @bind-Value="model.Ime" />
+    </div>
+
+    <div class="form-group">
+        <label>Prezime:</label>
+        <InputText class="form-control" @bind-Value="model.Prezime" />
+    </div>
+
+    <div class="form-group">
+        <label>Email:</label>
+        <InputText class="form-control" @bind-Value="model.Email" />
+    </div>
+
+    <div class="form-group">
+        <label>Lozinka:</label>
+        <InputText type="password" class="form-control" @bind-Value="model.Password" />
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Registruj se</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(poruka))
+{
+    <div class="alert alert-info mt-3">@poruka</div>
+}
+
+@code {
+    private RegisterModel model = new();
+    private string poruka;
+
+    private async Task RegistrujKorisnika()
+    {
+        var user = new User
+            {
+                Ime = model.Ime,
+                Prezime = model.Prezime,
+                Email = model.Email,
+                PasswordHash = model.Password // hashira se u servisu
+            };
+
+        var rezultat = await UserService.Registruj(user);
+
+        if (rezultat)
+        {
+            poruka = "Uspješna registracija! Preusmjeravanje na login...";
+            StateHasChanged(); // obavezno da se poruka prikaže odmah
+            await Task.Delay(2000); // čekaj 2 sekunde
+            Navigation.NavigateTo("/login");
+        }
+        else
+        {
+            poruka = "Korisnik sa ovim emailom već postoji.";
+        }
+    }
+}
+
+
+
+
+@*@page "/registracija"
+@using AutoCentarBundic.Data
+@using AutoCentarBundic.Services;
+@inject NavigationManager Navigation
+@inject UserService UserService
+
+<h3>Registracija korisnika</h3>
+
+<EditForm Model="@noviKorisnik" OnValidSubmit="RegistrujKorisnika">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="ime">Ime:</label>
+        <InputText id="ime" class="form-control" @bind-Value="noviKorisnik.Ime" />
+    </div>
+
+    <div class="form-group">
+        <label for="prezime">Prezime:</label>
+        <InputText id="prezime" class="form-control" @bind-Value="noviKorisnik.Prezime" />
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <InputText id="email" class="form-control" @bind-Value="noviKorisnik.Email" />
+    </div>
+
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <InputText id="password" type="password" class="form-control" @bind-Value="noviKorisnik.PasswordHash" />
+    </div>
+    
+    <button type="submit" class="btn btn-primary mt-3">Registruj se</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(poruka))
+{
+    <div class="alert alert-info mt-3">@poruka</div>
+}
+
+@code {
+    private User noviKorisnik = new();
+    private string poruka = string.Empty;
+
+    private async Task RegistrujKorisnika()
+    {
+        var rezultat = await UserService.Registruj(noviKorisnik);
+        if (rezultat)
+        {
+            poruka = "Uspješno ste se registrovali!";
+
+            await Task.Delay(2000);
+
+            Navigation.NavigateTo("/login");
+        }
+        else
+        {
+            poruka = "Registracija nije uspjela. Pokušajte ponovo.";
+        }
+    }
+
+}*@
+

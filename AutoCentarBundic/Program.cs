@@ -1,5 +1,7 @@
 using AutoCentarBundic.Data;
+using AutoCentarBundic.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,9 +13,14 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<TerminService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+builder.Services.AddScoped<CustomAuthenticationStateProvider>();
+builder.Services.AddAuthorizationCore();
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContextFactory<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddScoped<HttpClient>(s =>
 {
     var navigationManager = s.GetRequiredService<NavigationManager>();

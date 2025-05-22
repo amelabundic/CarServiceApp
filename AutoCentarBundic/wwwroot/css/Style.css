@@ -1,0 +1,207 @@
+﻿/* Header */
+.auth-section {
+    background-color: #6C757D; /* Već imaš */
+    padding: 15px 0;
+    width: 100%;
+}
+
+.auth-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+/* Navigacija u headeru */
+.nav .about-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+    .nav .about-link.active,
+    .nav .about-link:hover {
+        text-decoration: underline;
+        color: #0078D4;
+    }
+
+/* Footer */
+.footer {
+    background-color: #6C757D; /* već imaš */
+    padding: 20px 0;
+    text-align: center;
+}
+
+    .footer p {
+        font-size: 14px;
+        color: white;
+        margin: 5px 0;
+    }
+
+.contact-link {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+    .contact-link:hover {
+        text-decoration: underline;
+    }
+
+/* Glavni sadržaj sa marginama */
+main.container.my-4 {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    min-height: 70vh; /* da footer ne visi na sredini kad je malo sadržaja */
+}
+
+
+/*body {
+    background-color: lightgrey;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}*/
+
+/* Centriranje sadržaja */
+/*.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px;
+    text-align: center;
+}*/
+
+/* Naslovi */
+/*.title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #0078D4;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 30px;
+}*/
+
+/* Kartice */
+/*.grid {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.card {
+    display: block;
+    width: 250px;
+    padding: 20px;
+    text-align: center;
+    border: 2px solid #0078D4;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #0078D4;
+    transition: 0.3s;
+}
+
+    .card:hover {
+        background-color: #0078D4;
+        color: white;
+        transform: scale(1.05);
+    }*/
+
+/* Autentikacija (vrh stranice) */
+/*.auth-section {
+    background-color: #6C757D;
+    padding: 15px 0;
+    width: 100%;
+}
+
+.auth-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.about-link {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+    .about-link:hover {
+        text-decoration: underline;
+    }*/
+
+/* Dugmad */
+/*.btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+    transition: 0.3s;
+}
+
+.login-btn {
+    background-color: #0078D4;
+    color: white;
+}
+
+.register-btn {
+    background-color: #28A745;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}*/
+
+/* Footer */
+/*.footer {
+    background-color: #6C757D;
+    padding: 20px 0;
+    text-align: center;
+}
+
+    .footer p {
+        font-size: 14px;
+        color: white;
+        margin: 5px 0;
+    }
+
+.contact-link {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+    .contact-link:hover {
+        text-decoration: underline;
+    }*/
+
+/* Puna širina */
+/*.full-width-section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}*/
+
+/* Utility razmak između elemenata */
+/*.space-x-4 > * + * {
+    margin-left: 1rem;
+}*/
+
+
+
+

@@ -1,19 +1,81 @@
 ﻿@inherits LayoutComponentBase
+@inject CustomAuthenticationStateProvider AuthProvider
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+@using AutoCentarBundic.Services;
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+
 
 <PageTitle>AutoCentarBundic</PageTitle>
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<header class="auth-section full-width-section">
+    <div class="container auth-inner d-flex justify-content-between align-items-center">
+        <nav class="nav d-flex gap-3">
+            <NavLink href="/" class="about-link" Match="NavLinkMatch.All">Početna</NavLink>
+            <NavLink href="/termini" class="about-link">Termini</NavLink>
+        </nav>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        <div class="auth-buttons d-flex align-items-center">
+            @if (!string.IsNullOrEmpty(userEmail))
+            {
+                <span class="me-3">Dobrodošao: <strong>@userEmail</strong></span>
+                <button class="btn btn-outline-danger" @onclick="Logout">Odjava</button>
+            }
+            else
+            {
+                <NavLink href="/login" class="btn btn-outline-primary me-2">Prijava</NavLink>
+                <NavLink href="/registracija" class="btn btn-primary">Registracija</NavLink>
+            }
         </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
 </div>
+</header>
+
+<!-- Glavni naslov stranice -->
+<div class="container text-center my-4">
+    <h1 class="display-4">Auto centar Bundić - Inteligentni servis</h1>
+</div>
+
+<main class="container my-4">
+    @Body
+</main>
+
+<footer class="footer full-width-section">
+    <div class="container">
+        <p>&copy; 2025 AutoCentar Bundić - Sva prava zadržana.</p>
+        <p>
+            Kontakt:
+            <a href="mailto:acbundic@gmail.com" class="contact-link">acbundic@gmail.com</a> |
+            Mob: +387 61 351 043
+        </p>
+    </div>
+</footer>
+
+@code {
+    private string? userEmail;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var authState = await AuthProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity != null && user.Identity.IsAuthenticated)
+            {
+                userEmail = user.Identity.Name;
+                StateHasChanged(); // osvježi UI
+            }
+        }
+    }
+
+    private async Task Logout()
+    {
+        if (AuthProvider is CustomAuthenticationStateProvider customAuth)
+        {
+            customAuth.MarkUserAsLoggedOut();
+        }
+
+        Navigation.NavigateTo("/");
+    }
+}

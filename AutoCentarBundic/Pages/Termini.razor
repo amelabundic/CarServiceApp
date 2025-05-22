@@ -1,38 +1,35 @@
-﻿@using AutoCentarBundic.Data
-@using Microsoft.EntityFrameworkCore;
-
-@page "/termini"
+﻿@page "/termini"
+@using AutoCentarBundic.Data
+@using Microsoft.EntityFrameworkCore
 @inject TerminService TerminService
 
+<h3 class="title">Zakazani termini</h3>
 
-<h3>Zakazani termini</h3>
-
-@if(termini == null)
+@if (termini == null)
 {
     <p>Učitavanje termina...</p>
 }
-
-else if(!termini.Any())
+else if (!termini.Any())
 {
-   <p>Nema zakazanih termina.</p>
+    <p>Nema zakazanih termina.</p>
 }
-
 else
 {
- <table class="table">
-     <thead>
-         <tr>
-             <th>Ime</th>
-            <th>Prezime</th>
-            <th>Datum</th>
-            <th>Automobil</th>
-            <th>Problem</th>
-         </tr>
-     </thead>
-     <tbody>
-         @foreach(var termin in termini)
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ime</th>
+                <th>Prezime</th>
+                <th>Datum</th>
+                <th>Automobil</th>
+                <th>Problem</th>
+                <th>Akcije</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var termin in termini)
             {
-               <tr>
+                <tr>
                     <td>@termin.Ime</td>
                     <td>@termin.Prezime</td>
                     <td>@termin.Datum.ToString("dd.MM.yyyy HH:mm")</td>
@@ -42,16 +39,11 @@ else
                         <a href="@($"/termin/{termin.Id}")" class="btn btn-info me-2">Detalji</a>
                         <button @onclick="() => DeleteTermin(termin.Id)" class="btn btn-danger">Obriši</button>
                     </td>
-
-               </tr>
+                </tr>
             }
-    </tbody>
- </table>
-
-   
-
+        </tbody>
+    </table>
 }
-
 
 @code {
     private List<Termin> termini = new();
