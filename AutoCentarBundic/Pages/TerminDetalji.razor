@@ -1,13 +1,12 @@
 ﻿@page "/termin/{id:int}"
 @inject TerminService TerminService
 @inject NavigationManager Navigation
-@using Microsoft.AspNetCore.Components.Forms
 
 <h3>Uredi termin</h3>
 
 @if (termin == null)
 {
-        <p>Termin nije pronađen.</p>
+    <p>Termin nije pronađen.</p>
 }
 else
 {

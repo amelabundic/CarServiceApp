@@ -1,0 +1,55 @@
+﻿@using AutoCentarBundic.Services
+@using Microsoft.EntityFrameworkCore;
+@page "/login"
+@inject NavigationManager Navigation
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject CustomAuthenticationStateProvider AuthProvider
+
+<div class="container mt-5" style="max-width: 500px;">
+    <h3 class="mb-4 text-center">Prijava korisnika</h3>
+
+    <EditForm Model="model" OnValidSubmit="HandleLogin">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group mb-3">
+            <label for="email">Email:</label>
+            <InputText id="email" class="form-control" @bind-Value="model.Email" />
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="lozinka">Lozinka:</label>
+            <InputText id="lozinka" type="password" class="form-control" @bind-Value="model.Password" />
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Prijavi se</button>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger mt-3">@errorMessage</div>
+    }
+</div>
+
+@code {
+    private LoginModel model = new();
+    private string errorMessage;
+
+    private async Task HandleLogin()
+    {
+        using var db = DbFactory.CreateDbContext();
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+
+        if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
+        {
+            errorMessage = "Neispravan email ili lozinka.";
+            return;
+        }
+
+        await AuthProvider.MarkUserAsAuthenticated(user.Email);
+        Navigation.NavigateTo("/");
+    }
+}
+
+
+

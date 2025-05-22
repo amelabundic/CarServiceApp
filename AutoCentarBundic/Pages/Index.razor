@@ -1,9 +1,31 @@
 ﻿@page "/"
+@inject NavigationManager Navigation
 
-<PageTitle>Index</PageTitle>
+<h1 class="title">Dobrodošli u Car Service!</h1>
+<p class="subtitle">Upravljajte zakazivanjem, AI analizom problema i održavanjem vozila na jednom mestu.</p>
 
-<h1>Hello, world!</h1>
+<div class="grid">
+    <div class="card" @onclick='() => Navigation.NavigateTo("/zakazivanje")' style="cursor:pointer;">
+        <h3>Zakazivanje termina &rarr;</h3>
+        <p>Birajte slobodne termine i upravljajte servisima.</p>
+    </div>
 
-Welcome to your new app.
+    <div class="card" @onclick='() => Navigation.NavigateTo("/dijagnoza")' style="cursor:pointer;">
+        <h3>AI dijagnoza problema &rarr;</h3>
+        <p>Unesite simptome i dobijte predikciju problema.</p>
+    </div>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    <div class="card" @onclick='() => Navigation.NavigateTo("/obavjestenja")' style="cursor:pointer;">
+        <h3>Real-time obaveštenja &rarr;</h3>
+        <p>Pratite status popravke vašeg vozila.</p>
+    </div>
+
+    <div class="card" @onclick='() => Navigation.NavigateTo("/chatbot")' style="cursor:pointer;">
+        <h3>Chatbot podrška &rarr;</h3>
+        <p>Pitajte AI asistenta za pomoć.</p>
+    </div>
+</div>
+
+
+
+

@@ -12,56 +12,58 @@ namespace AutoCentarBundic.Controllers
     [ApiController]
     public class TerminController : ControllerBase
     {
-        private readonly AppDbContext _dbContext;
+        private readonly IDbContextFactory<AppDbContext> _contextFactory;
 
-        public TerminController(AppDbContext dbContext)
+        public TerminController(IDbContextFactory<AppDbContext> contextFactory)
         {
-            _dbContext = dbContext;
+            _contextFactory = contextFactory;
         }
 
         // GET: api/termin
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Termin>>> GetTermini()
         {
-            return await _dbContext.Termini.ToListAsync();
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Termini.ToListAsync();
         }
 
         // POST: api/termin
         [HttpPost]
         public async Task<ActionResult> PostTermin(Termin noviTermin)
         {
-            _dbContext.Termini.Add(noviTermin);
-            await _dbContext.SaveChangesAsync();
-
-            return Ok(noviTermin); // frontend očekuje običan 200 OK s JSON tijelom
+            using var context = _contextFactory.CreateDbContext();
+            context.Termini.Add(noviTermin);
+            await context.SaveChangesAsync();
+            return Ok(noviTermin);
         }
 
         // DELETE: api/termin/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> ObrisiTermin(int id)
         {
-            var termin = await _dbContext.Termini.FindAsync(id);
+            using var context = _contextFactory.CreateDbContext();
+            var termin = await context.Termini.FindAsync(id);
             if (termin == null)
             {
                 return NotFound();
             }
 
-            _dbContext.Termini.Remove(termin);
-            await _dbContext.SaveChangesAsync();
-
-            return Ok(); // frontend koristi DeleteAsync, očekuje 200 ili 204
+            context.Termini.Remove(termin);
+            await context.SaveChangesAsync();
+            return Ok();
         }
 
         // PUT: api/termin/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTermin(int id, Termin azuriraniTermin)
         {
+            using var context = _contextFactory.CreateDbContext();
             if (id != azuriraniTermin.Id)
             {
                 return BadRequest();
             }
 
-            var termin = await _dbContext.Termini.FindAsync(id);
+            var termin = await context.Termini.FindAsync(id);
             if (termin == null)
             {
                 return NotFound();
@@ -73,14 +75,15 @@ namespace AutoCentarBundic.Controllers
             termin.Automobil = azuriraniTermin.Automobil;
             termin.Problem = azuriraniTermin.Problem;
 
-            await _dbContext.SaveChangesAsync();
-            return Ok(); // frontend očekuje status 200 OK, ne koristi CreatedAtAction
+            await context.SaveChangesAsync();
+            return Ok();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Termin>> GetTerminById(int id)
         {
-            var termin = await _dbContext.Termini.FindAsync(id);
+            using var context = _contextFactory.CreateDbContext();
+            var termin = await context.Termini.FindAsync(id);
 
             if (termin == null)
             {
@@ -89,27 +92,6 @@ namespace AutoCentarBundic.Controllers
 
             return Ok(termin);
         }
-        // PUT: api/termin/{id}
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> UpdateTermin(int id, Termin termin)
-        //{
-        //    if (id != termin.Id)
-        //        return BadRequest("ID ne odgovara");
-
-        //    var existing = await _dbContext.Termini.FindAsync(id);
-        //    if (existing == null)
-        //        return NotFound();
-
-        //    existing.Ime = termin.Ime;
-        //    existing.Prezime = termin.Prezime;
-        //    existing.Automobil = termin.Automobil;
-        //    existing.Problem = termin.Problem;
-        //    existing.Datum = termin.Datum;
-
-        //    await _dbContext.SaveChangesAsync();
-
-        //    return NoContent();
-        //}
-
     }
+
 }
