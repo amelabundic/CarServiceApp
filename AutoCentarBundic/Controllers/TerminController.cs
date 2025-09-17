@@ -1,10 +1,6 @@
 ﻿using AutoCentarBundic.Data;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
-//using AutoCentarBundic.Data;
-//using AutoCentarBundic.Models;
 
 namespace AutoCentarBundic.Controllers
 {
@@ -91,6 +87,18 @@ namespace AutoCentarBundic.Controllers
             }
 
             return Ok(termin);
+        }
+
+        [HttpGet("email/{email}")]
+        public async Task<ActionResult<IEnumerable<Termin>>> GetTerminByEmail(string email)
+        {
+            using var context = _contextFactory.CreateDbContext();
+
+            var termini = await context.Termini
+                .Where(t => t.Email == email)
+                .ToListAsync();
+
+            return Ok(termini);
         }
     }
 

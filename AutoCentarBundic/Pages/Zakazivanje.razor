@@ -1,16 +1,22 @@
 ﻿@page "/zakazivanje"
 @using AutoCentarBundic.Data
-@using Microsoft.EntityFrameworkCore
-@using System.Net.Http.Json
-
 @inject TerminService TerminService
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <h3 class="title">Dodaj termin</h3>
 
-<EditForm Model="@noviTermin" OnValidSubmit="@SubmitForm">
+<EditForm Model="@noviTermin" OnValidSubmit="@SubmitForm" class="termin-form">
     <DataAnnotationsValidator />
     <ValidationSummary />
+
+    @if (string.IsNullOrEmpty(noviTermin.Email))
+    {
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <InputText id="email" class="form-control" @bind-Value="noviTermin.Email" />
+        </div>
+    }
 
     <div class="form-group">
         <label for="ime">Ime:</label>
@@ -34,18 +40,15 @@
 
     <div class="form-group">
         <label for="vrijeme">Vrijeme:</label>
-        <div class="form-row d-flex align-items-center mt-2">
-            <label class="mr-2">Odaberi vrijeme:</label>
-
-            <select class="form-control mr-2" style="width: 100px;" @bind="sati">
+        <div class="d-flex align-items-center gap-2 mt-2">
+            <label class="m-0">Odaberi vrijeme:</label>
+            <select class="form-control" style="width: 100px;" @bind="sati">
                 @for (int h = 8; h <= 17; h++)
                 {
                     <option value="@h">@h.ToString("D2")</option>
                 }
             </select>
-
-            <span class="mr-2">:</span>
-
+            <span>:</span>
             <select class="form-control" style="width: 100px;" @bind="minute">
                 @for (int m = 0; m < 60; m += 5)
                 {
@@ -65,7 +68,7 @@
         <InputTextArea id="problem" class="form-control" @bind-Value="noviTermin.Problem" />
     </div>
 
-    <button type="submit" class="btn btn-primary" disabled="@disableSubmit">Dodaj termin</button>
+    <button type="submit" class="btn btn-primary mt-3" disabled="@disableSubmit">Dodaj termin</button>
 </EditForm>
 
 @if (!string.IsNullOrEmpty(poruka))
@@ -76,25 +79,39 @@
 @code {
     private Termin noviTermin = new Termin();
     private DateTime datum = DateTime.Today;
-    private string vrijemeString = "08:00";
     private TimeSpan? vrijeme;
     private bool invalidTime = false;
     private bool disableSubmit = false;
     private string poruka = string.Empty;
 
-    protected override void OnInitialized()
-    {
-        vrijeme = TimeSpan.Parse(vrijemeString);
-    }
-
     private int sati = 8;
     private int minute = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Reset forme na svakom ulasku
+        noviTermin = new Termin();
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            noviTermin.Email = user.Identity.Name;
+        }
+
+        datum = DateTime.Today;
+        sati = 8;
+        minute = 0;
+        vrijeme = new TimeSpan(sati, minute, 0);
+        invalidTime = false;
+        disableSubmit = false;
+        poruka = string.Empty;
+    }
 
     private async Task SubmitForm()
     {
         vrijeme = new TimeSpan(sati, minute, 0);
-        vrijemeString = vrijeme.Value.ToString(@"hh\:mm");
-
         var start = new TimeSpan(8, 0, 0);
         var end = new TimeSpan(17, 0, 0);
         invalidTime = vrijeme < start || vrijeme > end;
@@ -108,15 +125,30 @@
 
             if (uspjesno)
             {
-                noviTermin = new Termin();
+                poruka = "Termin uspješno dodan!";
+
+                // reset forme osim emaila prijavljenog korisnika
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                var user = authState.User;
+
+                noviTermin = new Termin
+                    {
+                        Email = user.Identity?.Name,
+                        Ime = string.Empty,
+                        Prezime = string.Empty,
+                        Automobil = string.Empty,
+                        Problem = string.Empty
+                    };
                 datum = DateTime.Today;
-                vrijemeString = "08:00";
-                vrijeme = TimeSpan.Parse(vrijemeString);
+                sati = 8;
+                minute = 0;
+                vrijeme = new TimeSpan(sati, minute, 0);
                 disableSubmit = false;
                 invalidTime = false;
 
-                Navigation.NavigateTo("/termini", forceLoad: true);
-                return;
+                StateHasChanged();
+
+                Navigation.NavigateTo("/profil", forceLoad: true);
             }
             else
             {
@@ -125,4 +157,8 @@
         }
     }
 }
+
+
+
+
 

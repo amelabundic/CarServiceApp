@@ -1,4 +1,5 @@
 ﻿using AutoCentarBundic.Data;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System.Net.Http.Json;
 
 public class TerminService
@@ -40,6 +41,12 @@ public class TerminService
         }
         return response.IsSuccessStatusCode;
     }
+
+    public async Task<List<Termin>> GetTerminiByEmailAsync(string email)
+    {
+        return await _http.GetFromJsonAsync<List<Termin>>($"api/termin/email/{email}");
+    }
+
 
 
 }

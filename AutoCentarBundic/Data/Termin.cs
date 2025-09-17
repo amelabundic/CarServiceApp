@@ -16,6 +16,8 @@ namespace AutoCentarBundic.Data
         public string Automobil { get; set; } = string.Empty;
         [Required(ErrorMessage = "Opis problema na automobilu je obavezan")]
         public string Problem { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Unesite vas e-mail.")]
+        public string Email { get; set; } = string.Empty;
 
     }
 }

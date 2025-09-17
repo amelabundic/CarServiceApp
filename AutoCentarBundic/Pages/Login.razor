@@ -1,4 +1,101 @@
-﻿@using AutoCentarBundic.Services
+﻿@page "/login"
+@using AutoCentarBundic.Services
+@using Microsoft.EntityFrameworkCore
+@inject NavigationManager Navigation
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject CustomAuthenticationStateProvider AuthProvider
+
+<div class="container mt-5" style="max-width: 500px;">
+    <h3 class="mb-4 text-center">Prijava korisnika</h3>
+
+    <EditForm Model="model" OnValidSubmit="HandleLogin" @key="model">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <InputText id="email" class="form-control mb-2" placeholder="Email"
+                   @bind-Value="model.Email" autocomplete="off" />
+
+        <InputText id="lozinka" type="password" class="form-control mb-2" placeholder="Lozinka"
+                   @bind-Value="model.Password" autocomplete="new-password" />
+
+        <button type="submit" class="btn btn-primary w-100">Prijavi se</button>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger mt-3">@errorMessage</div>
+    }
+</div>
+
+@code {
+    private LoginModel model = new();
+    private string errorMessage;
+
+    protected override void OnInitialized()
+    {
+        ResetForm();
+    }
+
+    private void ResetForm()
+    {
+        model = new LoginModel(); // reset polja
+        errorMessage = string.Empty;
+    }
+
+    private async Task HandleLogin()
+    {
+        using var db = DbFactory.CreateDbContext();
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+
+        if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
+        {
+            errorMessage = "Neispravan email ili lozinka.";
+            return;
+        }
+
+        await AuthProvider.MarkUserAsAuthenticated(user.Email);
+
+        // reset forme prije navigacije
+        ResetForm();
+
+        // force reload da header osvježi
+        Navigation.NavigateTo("/profil", true);
+    }
+}
+
+
+
+
+
+
+
+@* @code {
+    private LoginModel model = new();
+    private string errorMessage;
+
+    private async Task HandleLogin()
+    {
+        using var db = DbFactory.CreateDbContext();
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+
+        if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
+        {
+            errorMessage = "Neispravan email ili lozinka.";
+            return;
+        }
+
+        // Prijava korisnika
+        await AuthProvider.MarkUserAsAuthenticated(user.Email);
+
+        // Bez forceLoad, Blazor će sam refreshati layout
+        Navigation.NavigateTo("profil");
+    } *@
+}
+
+
+
+
+@* @using AutoCentarBundic.Services
 @using Microsoft.EntityFrameworkCore;
 @page "/login"
 @inject NavigationManager Navigation
@@ -53,3 +150,4 @@
 
 
 
+ *@
