@@ -1,6 +1,5 @@
-﻿@page "/fetchdata"
+﻿@* @page "/fetchdata"
 @using AutoCentarBundic.Data
-@inject WeatherForecastService ForecastService
 
 <PageTitle>Weather forecast</PageTitle>
 
@@ -44,4 +43,4 @@ else
     {
         forecasts = await ForecastService.GetForecastAsync(DateOnly.FromDateTime(DateTime.Now));
     }
-}
+} *@
